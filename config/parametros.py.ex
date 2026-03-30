@@ -6,7 +6,7 @@ tempoAcionamentoRele = 2
 ponto = "46"                # Ponto criado no filaescola
 codeevento = "0"            # 0-Saida, 1-Entrada
 leitor = 1                  # 1-Novo (10 dig), 0-Antigo
-imagemlogo = "/home/pi/raspberry-portoes/assets/logo.png
+imagemlogo = "/home/pi/raspberry_portoes/assets/logo.png
 
 # --- Configuração do novo DASHBOARD Central ---
 
