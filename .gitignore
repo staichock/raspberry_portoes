@@ -1,0 +1,10 @@
+# Ignorar configurações locais
+
+config/parametros.py
+
+# Ignorar arquivos de cache e sistema
+
+__pycache__/
+*.pyc 
+data/crachas_contingencia.json
+.DS_Store
