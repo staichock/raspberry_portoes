@@ -53,7 +53,7 @@ class App(Frame):
         self.labelphoto.configure(bg='#222B59')
 
     def keyup(self, e):
-        # Captura o final da leitura do crachá (Enter)
+        # Captura o final da leitura do crachá (Enter/Return)
         if e.keysym in ("Return", "KP_Enter") or e.char == '\r':
             if self.strVar:
                 if parametros.leitor == 1:
@@ -78,6 +78,14 @@ class App(Frame):
             self.strVar = ""
 
     def registra(self):
+        # --- NOVO: Lógica de Acesso Restrito (Whitelist Local) ---
+        if hasattr(parametros, 'acesso_restrito') and parametros.acesso_restrito:
+            if self.strVar not in parametros.crachas_autorizados:
+                print(f"BLOQUEIO: Crachá {self.strVar} não está na lista de autorizados deste ponto.")
+                self.negar()
+                return # Interrompe o processo aqui mesmo
+
+        # Se não for restrito ou se o crachá estiver na lista, segue para o TOTVS
         urlTOTVS = f"http://172.16.0.71/ac_registers/rest/{parametros.ponto}/{self.strVar}/{parametros.codevento}"
         
         try:
@@ -125,13 +133,11 @@ if __name__ == "__main__":
     root = Tk()
     app = App(root)
     
-    # --- VINCULAÇÃO GLOBAL DE TECLADO ---
     # Vinculamos o evento de tecla diretamente no root (janela principal)
-    # Isso garante que o leitor USB seja ouvido independente do widget focado.
     root.bind("<Key>", app.keyup)
     
-    # Configurações de exibição
+    # Configurações de exibição e Foco
     root.attributes('-fullscreen', True)
-    root.focus_force() # Rouba o foco do sistema para o programa
+    root.focus_force() 
     
     root.mainloop()
