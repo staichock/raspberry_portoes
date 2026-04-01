@@ -22,18 +22,32 @@ def enviar_heartbeat(unidade, local, ip_central):
 def sincronizar_offline(unidade, ip_central):
     """ Baixa a lista de crachás permitidos na queda de rede """
     try:
-        url = f"http://{ip_central}:8000/sync_offline/{unidade}"
+        # 1. Tratamos o nome da unidade para a URL (ex: 'SANTA FELICIDADE' vira 'SANTA%20FELICIDADE')
+        unidade_url = quote(unidade.upper().strip())
+        url = f"http://{ip_central}:8000/sync_offline/{unidade_url}"
+        
         r = requests.get(url, timeout=5)
+        
         if r.status_code == 200:
-            # Garante que a pasta data existe para salvar o cache
-            if not os.path.exists("data"): 
-                os.makedirs("data")
+            dados_novos = r.json()
             
-            with open("data/crachas_contingencia.json", "w") as f:
-                json.dump(r.json(), f)
+            # 2. Garante que a pasta data existe
+            if not os.path.exists("data"): 
+                os.makedirs("data", exist_ok=True)
+            
+            # 3. Salva o arquivo com indentação para facilitar sua conferência
+            caminho = "data/crachas_contingencia.json"
+            with open(caminho, "w", encoding="utf-8") as f:
+                json.dump(dados_novos, f, ensure_ascii=False, indent=4)
+            
+            print(f"✅ Sync OK! {len(dados_novos)} crachás salvos para {unidade}")
             return True
+        else:
+            print(f"❌ Erro na Central: Status {r.status_code} para unidade {unidade}")
+            return False
+            
     except Exception as e:
-        print(f"Erro Sync: {e}")
+        print(f"⚠️ Erro Sync: {e}")
         return False
 
 def verificar_cache_offline(cartao_lido):

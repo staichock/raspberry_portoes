@@ -5,12 +5,6 @@ from tkinter import *
 import time
 import os
 
-# --- Criação do diretorio data ---
-
-if not os.path.exists('data')
-    os.makedirs('data')
-    print("Pasta 'data' criada com sucesso!")
-
 # Importamos nossos módulos de configuração e comunicação
 from config import parametros
 from core import comunicacao
