@@ -2,12 +2,18 @@ import requests
 import json
 import os
 
-def enviar_heartbeat(unidade, ip_central):
-    """ Avisa a Central que este Raspberry está vivo """
+def enviar_heartbeat(unidade, local, ip_central):
+    """ Avisa a Central que este Raspberry está vivo e onde ele está """
     try:
         url = f"http://{ip_central}:8000/heartbeat"
-        # Enviamos um JSON com o nome da unidade para a VM
-        requests.post(url, json={"unidade": unidade}, timeout=2)
+        
+        # AJUSTE AQUI: Adicionamos o campo "local" no JSON enviado
+        dados = {
+            "unidade": unidade,
+            "local": local
+        }
+        
+        requests.post(url, json=dados, timeout=2)
         return True
     except Exception as e:
         print(f"Erro Heartbeat: {e}")
