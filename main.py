@@ -43,7 +43,7 @@ class App(Frame):
 
     def ciclo_manutencao(self):
         """ Roda em segundo plano a cada 60 segundos. """
-        comunicacao.enviar_heartbeat(parametros.unidade_logica, parametros.ip_central)
+        comunicacao.enviar_heartbeat(parametros.unidade_logica, parametros.localizacao, parametros.ip_central)
         comunicacao.sincronizar_offline(parametros.unidade_logica, parametros.ip_central)
         self.master.after(60000, self.ciclo_manutencao)
 

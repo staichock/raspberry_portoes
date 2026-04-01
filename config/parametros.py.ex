@@ -10,6 +10,7 @@ imagemlogo = "/home/pi/raspberry_portoes/assets/logo.png"
 # --- Configuração do novo DASHBOARD Central ---
 
 unidade_logica = "BARIGUI"
+localizacao = "Porta Servidor"
 ip_central = "172.16.0.196" # IP da Central
 
 # Se for True, apenas os crachás na lista abaixo abrem o portão
