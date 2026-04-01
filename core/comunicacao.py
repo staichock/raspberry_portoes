@@ -19,35 +19,38 @@ def enviar_heartbeat(unidade, local, ip_central):
         print(f"Erro Heartbeat: {e}")
         return False
 
+# --- LÓGICA DE CAMINHO ABSOLUTO ---
+# Isso descobre a pasta real onde o script está, independente de como foi iniciado
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PASTA_DATA = os.path.join(BASE_DIR, "data")
+ARQUIVO_JSON = os.path.join(PASTA_DATA, "crachas_contingencia.json")
+
 def sincronizar_offline(unidade, ip_central):
-    """ Baixa a lista de crachás permitidos na queda de rede """
+    """ Baixa a lista de crachás e garante a criação da pasta no local correto """
     try:
-        # 1. Tratamos o nome da unidade para a URL (ex: 'SANTA FELICIDADE' vira 'SANTA%20FELICIDADE')
-        unidade_url = quote(unidade.upper().strip())
-        url = f"http://{ip_central}:8000/sync_offline/{unidade_url}"
-        
+        # 1. Tenta criar a pasta usando o caminho absoluto
+        if not os.path.exists(PASTA_DATA):
+            os.makedirs(PASTA_DATA, exist_ok=True)
+            print(f"📂 Pasta criada em: {PASTA_DATA}")
+
+        url = f"http://{ip_central}:8000/sync_offline/{unidade}"
         r = requests.get(url, timeout=5)
         
         if r.status_code == 200:
-            dados_novos = r.json()
+            dados = r.json()
             
-            # 2. Garante que a pasta data existe
-            if not os.path.exists("data"): 
-                os.makedirs("data", exist_ok=True)
+            # 2. Grava o arquivo usando o caminho absoluto
+            with open(ARQUIVO_JSON, "w", encoding="utf-8") as f:
+                json.dump(dados, f, indent=4, ensure_ascii=False)
             
-            # 3. Salva o arquivo com indentação para facilitar sua conferência
-            caminho = "data/crachas_contingencia.json"
-            with open(caminho, "w", encoding="utf-8") as f:
-                json.dump(dados_novos, f, ensure_ascii=False, indent=4)
-            
-            print(f"✅ Sync OK! {len(dados_novos)} crachás salvos para {unidade}")
+            print(f"✅ Sync OK: {len(dados)} crachás salvos em {ARQUIVO_JSON}")
             return True
         else:
-            print(f"❌ Erro na Central: Status {r.status_code} para unidade {unidade}")
+            print(f"⚠️ Erro Central: Status {r.status_code}")
             return False
-            
+
     except Exception as e:
-        print(f"⚠️ Erro Sync: {e}")
+        print(f"❌ Falha Crítica no Sync: {e}")
         return False
 
 def verificar_cache_offline(cartao_lido):
